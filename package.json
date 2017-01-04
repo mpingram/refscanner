@@ -1,0 +1,21 @@
+{
+  "name": "refscanner",
+  "version": "0.0.1",
+  "description": "An application for quick reference-checking for scientific and student papers.",
+  "main": "refscanner.js",
+  "scripts": {
+    "start": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mpingram92@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^6.0.56",
+    "gulp": "^3.9.1",
+    "jasmine": "^2.5.2",
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-jasmine-html-reporter": "^0.2.2"
+  }
+}
