@@ -5,10 +5,30 @@
 // - checks main text for inline references - do they exist in biblio references? -- going backwards is the hard part. We'll need titles for the MLA and Chicago citations. -- re titles: should store as split array by words, look for first 3 elements? What about one-word titles? Ughhhhhhhhhhhghghghg
 'use strict';
 
-module.exports = RefChecker;
+import { ReferenceStyle, PossibleBiblioReferenceSet, MainTextReferenceSet, MissingReferenceSet } from "./typedefs";
 
+module.exports = RefChecker;
 class RefChecker {
+  
+  public calculateRefs( { mainText, bibliography, mainTextRefStyle, biblioRefStyle }
+                       : { mainText: string, bibliography: string, mainTextRefStyle: ReferenceStyle, biblioRefStyle: ReferenceStyle } ) : MissingReferenceSet {
+
+    let missingRefs: MissingReferenceSet;
+
+    return missingRefs;
+  }
 
 }
 
+function readBibliography( bibliography: string, mainTextRefStyle: ReferenceStyle, biblioRefStyle: ReferenceStyle ): PossibleBiblioReferenceSet {
+  let possibleBiblioRefs: PossibleBiblioReferenceSet;
+
+  return possibleBiblioRefs;
+}
+
+function readMainText( mainText: string, mainTextRefStyle: ReferenceStyle ): MainTextReferenceSet {
+  let mainTextRefs: MainTextReferenceSet;
+
+  return mainTextRefs;
+}
 
