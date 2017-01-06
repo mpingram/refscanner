@@ -1,1 +1,16 @@
-test 
+Prototype biblio parser for MLA style only
+
+[]- find way to reliably parse author list,
+	author first initial, pub date, and title from biblio ref
+
+[]- find best way to output/store set of possible main text refs.
+
+[]- write basic tests for span of mla refs.
+	[] - karma setup
+
+[]- think about e2e tests with full papers.
+
+
+NOTES =
+- consider unifying PossibleBiblioReferenceSet... etc
+	types into one ReferenceSet type?
