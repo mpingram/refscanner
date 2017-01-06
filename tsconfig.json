@@ -9,7 +9,8 @@
     "removeComments": false,
     "noImplicitAny": false,
     "outDir": "./compiled",
-    "rootDir":"./"
+    "rootDir":"./",
+    "allowJs":true
   },
   "exclude":[
     "node_modules",

@@ -10,9 +10,9 @@ export type MainTextReferenceSet = Array<string>;
 export type MissingReferenceSet = Array<string>;
 
 export interface Author {
-  firstname: string;
   lastname: string;
-  firstInitial: string;
+  firstname?: string;
+  firstInitial?: string;
 }
 
 export interface Reference {
