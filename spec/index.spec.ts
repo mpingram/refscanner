@@ -1,2 +1,0 @@
-import jasmine = require ("jasmine");
-

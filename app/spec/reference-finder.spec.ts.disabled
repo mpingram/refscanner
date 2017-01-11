@@ -1,0 +1,22 @@
+import { ReferenceFinder } from "../reference-finder";
+import { mockInputBibliographyAPA } from "./mock-input-bibliography-apa";
+
+
+describe( "Bibliography", () => {
+
+  describe( "APA parser", () => {
+
+    let correctOutput: any;
+    beforeEach( () => {
+      correctOutput = mockInputBibliographyAPA.solution;
+    });
+
+    it( "should accurately parse a single input", () => {
+      const firstInput = mockInputBibliographyAPA.smallValidSingle;
+      const firstSolution = correctOutput[0];
+      expect( firstInput ).toEqual( firstSolution );
+    });
+
+  });
+
+});
