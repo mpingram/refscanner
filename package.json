@@ -5,7 +5,7 @@
   "main": "refscanner.js",
   "scripts": {
     "start": "gulp",
-    "test": "jasmine-node dist/spec/ --color --autotest",
+    "test": "jasmine-node dist/spec/ --color --autotest --watch",
     "test-browser": "karma start karma.conf.js"
   },
   "author": "mpingram92@gmail.com",

@@ -2,7 +2,8 @@ import {
   Reference,
   UnparsedReference,
   ParsedReferenceSet,
-  Author
+  Author,
+  AuthorList
 } from "./typedefs";
 
 export class BibliographyParser {
@@ -12,6 +13,20 @@ export class BibliographyParser {
         if( entry.length > 1 ) return true;
         else return false;
       });
+    }
+
+    // helper routine to get first match from regex, regardless
+    // of capturing group order
+    private static getFirstMatch( regex: RegExp, text: string ): string | null {
+      const match: RegExpExecArray = regex.exec( text );
+      for ( let groupNumber = 1; groupNumber < match.length; groupNumber++ ){
+        let capturingGroup = match[ groupNumber ];
+        if ( capturingGroup !== undefined ) {
+          // trim just in case
+          return capturingGroup.trim();
+        }
+      }
+      return null;
     }
 
     static parseAPA( text: string ): ParsedReferenceSet {
@@ -26,15 +41,65 @@ export class BibliographyParser {
       // match valid date after two periods.
       const pubYearRe = /^.*?\..*?([1][0-9][0-9][0-9]|[2][0][0-2][0-9])/m;
 
+      // NOTES: regex testing urls
+      // names only:
+      // https://regex101.com/r/nhOttU/1
+      // full text:
+      // https://regex101.com/r/XyvvRy/1
+
       // helper functions
-      // -------------------
-      function parseNameListAPA( nameList: string, index: number, bibliographyArray: string[] ): Author[]|null {
-        // triple hyphen indicates same as previous author
-        // FIXME: remember that "---, Cohen, and Leonard" is valid.
-        // TODO: parse name list
-        //   - handle case where  first entry in nameList === "---" || name === "–––" || name === "———"
-        // name parsing regex candidate: ^(.+?),|and .*?([A-Z]\S+?\b)$|and .*?([A-Z]\S+?), [a-z]+?$|^(---)$|^(–––)$|^(———)$
-      }// https://regex101.com/r/nhOttU/1
+      // ==========================
+      function parseNameListAPA( nameListString: string, previouslyParsedReferences: Reference[] ): AuthorList {
+
+        // initialize output
+        let authorList: AuthorList;
+        let firstAuthor: Author;
+        let secondAuthor: Author;
+        let threeOrMoreAuthors: boolean;
+
+        // RegExps
+        // -------
+        const tripleHyphenRe: RegExp = /^(---)|^(–––)|^(———)/;
+        const etAlRe: RegExp = /et al/;
+        const primaryAuthorLastNameRe: RegExp = /^(.+?),/;
+        const secondaryAuthorLastNameRe: RegExp = /and .*?([A-Z]\S+?\b)$|and .*?([A-Z]\S+?), [a-z]+?$/;
+        const primaryAuthorFirstNameRe: RegExp = /^.+?, (.+?),|^.+?, (.+?)$/;
+        // -------
+
+        // parse name list
+        // ============
+
+        const primaryAuthorLastName: string = BibliographyParser.getFirstMatch( primaryAuthorLastNameRe, nameListString );
+        const secondaryAuthorLastName: string = BibliographyParser.getFirstMatch( secondaryAuthorLastNameRe, nameListString );
+        const primaryAuthorFirstName: string = BibliographyParsercls.getFirstMatch( primaryAuthorFirstNameRe, nameListString );
+
+        firstAuthor.lastname = primaryAuthorLastName
+        firstAuthor.firstname = primaryAuthorFirstName
+        firstAuthor.firstInitial = firstAuthor.firstname.slice(0);
+        // if we didn't match a second author, null the second author in our output AuthorList
+        if ( secondaryAuthorLastName === null ){
+          secondAuthor = null;
+        } else {
+          secondAuthor.lastname = secondaryAuthorLastName;
+        }
+       
+
+        const nameOmitted: boolean = tripleHyphenRe.test(nameListString);
+        const containsEtAl: boolean = etAlRe.test(nameListString);
+        if ( nameOmitted === true ){
+          const previousReference = previouslyParsedReferences[previouslyParsedReferences.length - 1];
+          firstAuthor = previousReference.parsedNameList.firstAuthor;
+        }
+        if ( containsEtAl === true ){
+          threeOrMoreAuthors = true;
+        }
+
+        authorList.firstAuthor = firstAuthor;
+        authorList.secondAuthor = secondAuthor;
+        authorList.threeOrMoreAuthors = threeOrMoreAuthors;
+        return authorList;
+      }
+
 
       function fixTitleQuotes( title: string ): string {
         // if title begins with a quotation mark but doesn't end with a quotation mark... 
@@ -44,7 +109,8 @@ export class BibliographyParser {
         }
         return title;
       }
-      // -----------------
+      // ==========================
+
 
       this.bibliographyToArray( text ).forEach( (entry, index, bibliographyArray) => {
 
@@ -53,6 +119,7 @@ export class BibliographyParser {
           parsedNameList: undefined,
           title: undefined,
           pubYear: undefined,
+          original: entry,
         };
 
         const nameListOrTitleMatch: RegExpExecArray = nameListOrTitleRe.exec( entry );
@@ -60,7 +127,8 @@ export class BibliographyParser {
         const pubYearMatch: RegExpExecArray = pubYearRe.exec( entry );
 
         if( nameListOrTitleMatch === null || pubYearMatch === null ){
-          unparsedReferences.push( entry );
+          // give up; we'll let the user figure this one out.
+          parsedReferences.push( reference );
         } else {
           if ( titleMatch === null ){
             // assume nameListOrTitleMatch matched title
@@ -72,16 +140,16 @@ export class BibliographyParser {
             // assume nameListOrTitleMatch matched nameList
             //   and titleMatch matched title
             reference.unparsedNameList = nameListOrTitleMatch[1];
-            reference.parsedNameList = parseNameListAPA( reference.unparsedNameList, index, bibliographyArray );
+            reference.parsedNameList = parseNameListAPA( reference.unparsedNameList, parsedReferences );
             reference.title = titleMatch[1];
           }
           // either way, store pubYear and add reference to parsedReferences
           reference.pubYear = pubYearMatch[1];
           parsedReferences.push( reference );
         }
-      }, [] );
+      });
 
-      return {parsedReferences, unparsedReferences};
+      return parsedReferences;
     }
 
     static parseHarvard( text: string ): ParsedReferenceSet {

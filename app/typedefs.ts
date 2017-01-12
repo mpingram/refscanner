@@ -11,18 +11,22 @@ export interface Author {
   firstInitial?: string;
 }
 
+export interface AuthorList {
+  firstAuthor: Author;
+  secondAuthor?: Author;
+  threeOrMoreAuthors?: boolean;// "et al." | "and colleagues"
+}
+
 export interface Reference {
   unparsedNameList?: string|null;
-  parsedNameList?: Author[]|null;
+  parsedNameList?: AuthorList|null;
   title?: string|null;
-  pubYear: string;
+  pubYear?: string;
+  original: string;
 }
 
 export type UnparsedReference = string;
-export interface ParsedReferenceSet {
-  unparsedReferences: UnparsedReference[],
-  parsedReferences: Reference[]
-}
+export type ParsedReferenceSet = Reference[];
 
 export type PossibleBiblioReferenceSet = Array<Array<string>>;
 export type MainTextReferenceSet = Array<string>;

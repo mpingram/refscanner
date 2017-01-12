@@ -1,7 +1,6 @@
 export const mockInputBibliographyAPA = {
   // TODO: update solution
-  solution: {
-    parsedReferences: [
+  solution: [
       {
         unparsedNameList: "Dean, Cornelia",
         parsedNameList: [
@@ -146,9 +145,6 @@ export const mockInputBibliographyAPA = {
         pubYear: "2003"
       },
     ],
-
-    unparsedReferences: [],
-  },
   
 
   smallValid: `Dean, Cornelia. "Executive on a Mission: Saving the Planet." The New York Times, 22 May 2007, www.nytimes.com/2007/05/22/science/earth/22ander.html?_r=0. Accessed 12 May 2016.
