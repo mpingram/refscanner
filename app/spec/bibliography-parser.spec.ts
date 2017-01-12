@@ -17,15 +17,23 @@ describe( "Bibliography Parser", () => {
       
       input = mockInputBibliographyAPA.smallValidSingle;
       
-      expectedOutput = { 
-        parsedReferences: mockInput.solution[0][0],
-        unparsedReferences: [] 
-      };
+      expectedOutput = mockInput.solution[0];
+      
 
       let output = BibliographyParser.parseAPA( input );
-      expect( output.parsedReferences ).toEqual( expectedOutput.parsedReferences );
+      expect( output ).toEqual( expectedOutput );
 
     });
+
+
+    it( "This is just to see what it does", () => {
+
+
+      input = mockInputBibliographyAPA.smallValid;
+      let output = BibliographyParser.parseAPA( input );
+      console.log( JSON.stringify( output, undefined, 4 ) );
+      expect( "your ass" ).toBe( "amazed or sad, maybe both" );
+    })
 
 
 

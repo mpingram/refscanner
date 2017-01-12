@@ -19,6 +19,9 @@ export class BibliographyParser {
     // of capturing group order
     private static getFirstMatch( regex: RegExp, text: string ): string | null {
       const match: RegExpExecArray = regex.exec( text );
+      if ( match === null ){
+        return null;
+      }
       for ( let groupNumber = 1; groupNumber < match.length; groupNumber++ ){
         let capturingGroup = match[ groupNumber ];
         if ( capturingGroup !== undefined ) {
@@ -27,6 +30,11 @@ export class BibliographyParser {
         }
       }
       return null;
+    }
+
+    private static getInitial( name: string | null ): string | null {
+      if ( name === null ) return null;
+      return name.slice(0,1);   
     }
 
     static parseAPA( text: string ): ParsedReferenceSet {
@@ -52,9 +60,9 @@ export class BibliographyParser {
       function parseNameListAPA( nameListString: string, previouslyParsedReferences: Reference[] ): AuthorList {
 
         // initialize output
-        let authorList: AuthorList;
-        let firstAuthor: Author;
-        let secondAuthor: Author;
+        let authorList: AuthorList = {} as AuthorList;
+        let firstAuthor: Author = {} as Author;
+        let secondAuthor: Author = {} as Author;
         let threeOrMoreAuthors: boolean;
 
         // RegExps
@@ -71,11 +79,11 @@ export class BibliographyParser {
 
         const primaryAuthorLastName: string = BibliographyParser.getFirstMatch( primaryAuthorLastNameRe, nameListString );
         const secondaryAuthorLastName: string = BibliographyParser.getFirstMatch( secondaryAuthorLastNameRe, nameListString );
-        const primaryAuthorFirstName: string = BibliographyParsercls.getFirstMatch( primaryAuthorFirstNameRe, nameListString );
+        const primaryAuthorFirstName: string = BibliographyParser.getFirstMatch( primaryAuthorFirstNameRe, nameListString );
 
         firstAuthor.lastname = primaryAuthorLastName
         firstAuthor.firstname = primaryAuthorFirstName
-        firstAuthor.firstInitial = firstAuthor.firstname.slice(0);
+        firstAuthor.firstInitial = BibliographyParser.getInitial( firstAuthor.firstname );
         // if we didn't match a second author, null the second author in our output AuthorList
         if ( secondaryAuthorLastName === null ){
           secondAuthor = null;
@@ -103,9 +111,12 @@ export class BibliographyParser {
 
       function fixTitleQuotes( title: string ): string {
         // if title begins with a quotation mark but doesn't end with a quotation mark... 
-        if( title.slice(0) === '"' && title.slice(-1) !== '"' ){
+        // FIXME: account for inner quotations (“ ”). Wow, not sure how to deal with that inconsistency
+        if( title.slice(0,1) === '"' && title.slice(-1) !== '"' ){
           // add a quotation mark to the end.
           title += '"';
+        } else if ( title.slice(0,1) === '“' && title.slice(-1) !== '”'){
+          title += '”';
         }
         return title;
       }
@@ -141,7 +152,8 @@ export class BibliographyParser {
             //   and titleMatch matched title
             reference.unparsedNameList = nameListOrTitleMatch[1];
             reference.parsedNameList = parseNameListAPA( reference.unparsedNameList, parsedReferences );
-            reference.title = titleMatch[1];
+            let title = titleMatch[1];
+            reference.title = fixTitleQuotes( title );
           }
           // either way, store pubYear and add reference to parsedReferences
           reference.pubYear = pubYearMatch[1];
