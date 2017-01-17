@@ -13,7 +13,7 @@ describe( "Bibliography Parser", () => {
     let input: string;
     let expectedOutput: ParsedReferenceSet;
 
-    it( "should accurately parse a single input", () => {
+    xit( "should accurately parse a single input", () => {
       
       input = mockInputBibliographyAPA.smallValidSingle;
       

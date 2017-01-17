@@ -41,8 +41,15 @@ export class BibliographyParser {
 
       let unparsedReferences: UnparsedReference[] = [];
       let parsedReferences: Reference[] = [];
-      // match first block of text until first period
-      const nameListOrTitleRe = /^(.+?)\./m;
+      // match first block of text until first period, so long as 
+      const nameListOrTitleRe = /^.*?et al\.|^.*?[\S]{3,}\./m;
+      // TODO: write RE to examine corner case where nameListOrTitle is a Name List
+      // wchich ended with 'Jr.', 'Sr.', or an initial.
+      // Strat: step back by one period. Is there an 'and' to the left?
+      // if so, look for Jr. or Sr. immediately to left.
+      // if not, look for single initial immediately to left.
+      // the result of this is important -- it'll determine where we look for the title. (!!)
+      const nameListEndCheck = /
       // match block of text between first and second period,
       //   after which should occur a date.
       const titleRe = /^.*?\. ?(.+?)\..+?([1][0-9][0-9][0-9]|[2][0][0-2][0-9])/m;

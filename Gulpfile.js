@@ -2,6 +2,7 @@ const gulp = require("gulp");
 const del = require("del");
 const typescript = require("gulp-typescript").createProject("tsconfig.json");
 const sourcemaps = require("gulp-sourcemaps");
+const jasmine = require("gulp-jasmine");
 
 function compileTs() {
   return gulp.src(["app/**/*@(.ts|.js)"])
@@ -17,11 +18,19 @@ function clean() {
 
 const build = gulp.series( clean, compileTs );
 
+function test() {
+  return gulp.src(["dist/**/*.spec.js"])
+    .pipe(jasmine({
+      errorOnFail: false,
+    }));
+}
+
 function watch(){
-  gulp.watch("app/**/*@(.ts|.js)", build);
+  gulp.watch("app/**/*@(.ts|.js)", gulp.series( build, test ));
 }
 
 
-//gulp.task("default", gulp.series( build, watch ));
-gulp.task("default", gulp.series( compileTs, watch ));
+gulp.task("default", gulp.series( build, test, watch ));
+
+gulp.task("test", test);
 
