@@ -1,3 +1,5 @@
+import { Match } from "../typedefs/parser-util-types";
+
 export class ParserUtils {
 
   static bibliographyToArray( text: string ) : string[] {
@@ -24,6 +26,46 @@ export class ParserUtils {
     return null;
   }
 
+  static execArrayToMatch( execArr: RegExpExecArray): Match {
+
+    let captures: string[] = [];
+
+    for ( let i = 1; i < execArr.length; i++){
+      if ( execArr[i] !== undefined ){
+        captures.push( execArr[i] );
+      }
+    }
+
+    const match: Match = {
+      fullMatch: execArr[0],
+      captures: captures,
+      index: execArr.index
+    }
+
+    return match;
+  }
+
+  static allMatches( regex: RegExp, text: string ): Match[] | null {
+    
+    let matches: Match[] = [ {} as Match ];
+    let noMatches: boolean = true;
+
+    let execArr: RegExpExecArray;
+    while ( ( execArr = regex.exec( text ) ) !== null ){
+      if ( noMatches !== false ){
+        noMatches = false;
+      }
+      // convert to Match and push to output array
+      matches.push( this.execArrayToMatch( execArr ))
+    }
+
+    if ( noMatches === true ){
+      return null;
+    } else {
+      return matches;
+    }
+  }
+
   static getInitialChar( name: string | null ): string | null {
     if ( name === null ) return null;
     return name.slice(0,1);   
@@ -42,7 +84,7 @@ export class ParserUtils {
   }
 
   static cleanTextInput( text: string ): string {
-    let cleanText = this._standardizeQuotationMarks( text );
+    let cleanText = this.standardizeQuotationMarks( text );
     return cleanText;
   }
 

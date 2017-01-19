@@ -1,4 +1,4 @@
-import { BibliographyParser } from "../bibliography-parser";
+import { APABibliographyParser } from "../parsers/APA/APA-bibliography-parser";
 
 import { mockInputBibliographyAPA } from "./mock-input-bibliography-apa";
 

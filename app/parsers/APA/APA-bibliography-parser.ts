@@ -2,13 +2,12 @@ import { ParserUtils } from "../parser-utils";
 import { Reference,
   Author,
   AuthorList,
-} from "../../typedefs";
+} from "../../typedefs/reference-types";
 
 
 export class APABibliographyParser {
 
-
-  static parse( bibliography: string ): Reference[] {
+  public static parse( bibliography: string ): Reference[] {
 
     let parsedReferences: Reference[] = [];
 
@@ -22,7 +21,6 @@ export class APABibliographyParser {
   }
 
   private static parseNameList( nameListString: string, previouslyParsedReferences: Reference[] ): AuthorList {
-
 
       let authorList: AuthorList = {} as AuthorList;
       authorList.firstAuthor = {} as Author;
@@ -39,7 +37,7 @@ export class APABibliographyParser {
 
       // =======================
 
-      // parse first author's name
+      // parse first author's name and add to AuthorList
       // -------------------------
       const primaryAuthorLastName: string   = ParserUtils.firstMatch( primaryAuthorLastNameRe, nameListString );
       const primaryAuthorFirstName: string  = ParserUtils.firstMatch( primaryAuthorFirstNameRe, nameListString );
@@ -55,7 +53,7 @@ export class APABibliographyParser {
         authorList.firstAuthor = previousReference.parsedNameList.firstAuthor;
       }
       
-      // parse second author's last name, if exists
+      // parse second author's last name, if exists, and add to AuthorList
       // -------------------------
       const secondaryAuthorLastName: string = ParserUtils.firstMatch( secondaryAuthorLastNameRe, nameListString );
       if ( secondaryAuthorLastName === null ){
@@ -79,26 +77,7 @@ export class APABibliographyParser {
   }
 
   private static parseReference( unparsedReference: string, previouslyParsedReferences: Reference[] ): Reference | null {
-    // match first block of text until first period, so long as 
-    const nameListOrTitleRe = /^.*?et al\.|^.*?[\S]{3,}\./m;
-    // TODO: write RE to examine corner case where nameListOrTitle is a Name List
-    // wchich ended with 'Jr.', 'Sr.', or an initial.
-    // Strat: step back by one period. Is there an 'and' to the left?
-    // if so, look for Jr. or Sr. immediately to left.
-    // if not, look for single initial immediately to left.
-    // the result of this is important -- it'll determine where we look for the title. (!!)
-    const nameListEndCheck = /[implement me]/g;
-    // match block of text between first and second period,
-    //   after which should occur a date.
-    const titleRe = /^.*?\. ?(.+?)\..+?([1][0-9][0-9][0-9]|[2][0][0-2][0-9])/m;
-    // match valid date after two periods.
-    const pubYearRe = /^.*?\..*?([1][0-9][0-9][0-9]|[2][0][0-2][0-9])/m;
-
-    // NOTES: regex testing urls
-    // names only:
-    // https://regex101.com/r/nhOttU/1
-    // full text:
-    // https://regex101.com/r/XyvvRy/1
+    
 
     let reference: Reference = { 
       unparsedNameList: undefined,
@@ -108,27 +87,62 @@ export class APABibliographyParser {
       original: unparsedReference,
     };
 
-    const nameListOrTitleMatch: RegExpExecArray = nameListOrTitleRe.exec( unparsedReference );
-    const titleMatch: RegExpExecArray = titleRe.exec( unparsedReference );
-    const pubYearMatch: RegExpExecArray = pubYearRe.exec( unparsedReference );
+    // RegExps
+    // ===========
+    // I. match first "block" of text.
+    //   Group 1: (3+ authors) Match first string ending with et al.
+    //   Group 2: (Titles, hyphens, and single-name authors) Match a string without commas in it that ends with a period. (Titles.)
+    //   Groups 3-9: (One author) Match everything after the first period, if
+    //               the first period doesn't end with an initial or family designations
+    //               (eg , Jr., Sr., I, II, III, IV, or V.)
+    //   Group 10: (Multiple Authors)
+    // Regex101 URL: https://regex101.com/r/ltAgTV/1
+    const nameListOrTitleRe = /(^.*?et al)\.|(^[^,]*?[\S]{3,})\.|(^[^,]+?,[^,]+?)\.|(^[^,]+?,[^,]+?, Jr)\.|(^[^,]+?,[^,]+?, Sr)\.|(^[^,]+?,[^,]+?, II)\.|(^[^,]+?,[^,]+?, III)\.|(^[^,]+?,[^,]+?, IV)\.|(^[^,]+?,[^,]+?, V)\.|(^.*?[\S]{3,})\./g;
+    
+    // II. match second "block" of text, if it appears to be a title.
+    //   Group 1: (Title) match block of text between first and second period,
+    //             after which should occur a date.
+    const titleRe = /^.*?\. ?(.+?)\..+?([1][0-9][0-9][0-9]|[2][0][0-2][0-9])/m;
 
+    // III. match publication year, which is located in different places
+    //    Group 1: match valid date that occurs after the title, after two periods.
+    const pubYearRe = /^.*?\. ?.+?\..+?([1][0-9][0-9][0-9]|[2][0][0-2][0-9])/m;
+    // ============
 
-    if ( titleMatch === null ){
+    const nameListOrTitle: string | null = ParserUtils.firstMatch( nameListOrTitleRe, unparsedReference );
+    const title: string | null           = ParserUtils.firstMatch( titleRe, unparsedReference );
+    const pubYear: string | null         = ParserUtils.firstMatch( pubYearRe, unparsedReference );
+   
+
+    // figure out if nameListOrTitle matched the name list or the title.
+    // ----
+    if ( title === null ){
       // assume nameListOrTitleMatch matched title
-      let title = nameListOrTitleMatch[1];
-      reference.title = fixTitleQuotes( title );
+      let title = nameListOrTitle;
+      reference.title = ParserUtils.fixMissingQuotationMark( title );
       reference.unparsedNameList = null;
       reference.parsedNameList = null;
     } else {
       // assume nameListOrTitleMatch matched nameList
       //   and titleMatch matched title
-      reference.unparsedNameList = nameListOrTitleMatch[1];
-      reference.parsedNameList = this.parseNameList( reference.unparsedNameList, previouslyParsedReferences );
-      let title = titleMatch[1];
       reference.title = ParserUtils.fixMissingQuotationMark( title );
+      reference.unparsedNameList = nameListOrTitle;
+      reference.parsedNameList = this.parseNameList( reference.unparsedNameList, previouslyParsedReferences );
     }
-    // either way, store pubYear and add reference to parsedReferences
-    reference.pubYear = pubYearMatch[1];
+
+
+    // search for the publication year
+    if ( reference.title !== null ){
+      // if we found the title, search for the pub year after it.
+      // (That way, we don't pick up years that are inside titles.)
+      const indexOfTitle = unparsedReference.indexOf( reference.title );
+      const referenceWithoutTitle: string = unparsedReference.slice( indexOfTitle );
+      reference.pubYear = ParserUtils.firstMatch( pubYearRe, referenceWithoutTitle );
+    } else {
+      // if we don't have a title, we're already in a bad way, so give up and
+      // let the human parse this one.
+      reference.pubYear = null;
+    }
     
     return reference;
   }
