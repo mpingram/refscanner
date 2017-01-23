@@ -23,6 +23,7 @@ export interface Reference {
   title?: string|null;
   pubYear?: string;
   original: string;
+  index: number;
 }
 
 export type UnparsedReference = string;

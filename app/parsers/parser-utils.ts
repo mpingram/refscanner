@@ -9,7 +9,7 @@ export class ParserUtils {
     });
   }
 
-  static firstMatch( regex: RegExp, text: string ): string | null {
+  static firstCapturingGroup( regex: RegExp, text: string ): string | null {
     // helper routine to get first match from regex, regardless
     // of capturing group order
     const match: RegExpExecArray = regex.exec( text );
@@ -26,7 +26,11 @@ export class ParserUtils {
     return null;
   }
 
-  static execArrayToMatch( execArr: RegExpExecArray): Match {
+  static execArrayToMatch( execArr: RegExpExecArray | null ): Match | null {
+
+    if ( execArr === null ){
+      return null;
+    }
 
     let captures: string[] = [];
 
@@ -64,6 +68,11 @@ export class ParserUtils {
     } else {
       return matches;
     }
+  }
+
+  static firstMatch( regex: RegExp, text: string ): Match | null {
+    const execArr: RegExpExecArray | null = regex.exec( text );
+    return this.execArrayToMatch( execArr );
   }
 
   static getInitialChar( name: string | null ): string | null {

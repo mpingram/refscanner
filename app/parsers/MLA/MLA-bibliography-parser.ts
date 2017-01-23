@@ -39,8 +39,8 @@ export class APABibliographyParser {
 
       // parse first author's name and add to AuthorList
       // -------------------------
-      const primaryAuthorLastName: string   = ParserUtils.firstMatch( primaryAuthorLastNameRe, nameListString );
-      const primaryAuthorFirstName: string  = ParserUtils.firstMatch( primaryAuthorFirstNameRe, nameListString );
+      const primaryAuthorLastName: string   = ParserUtils.firstCapturingGroup( primaryAuthorLastNameRe, nameListString );
+      const primaryAuthorFirstName: string  = ParserUtils.firstCapturingGroup( primaryAuthorFirstNameRe, nameListString );
 
       authorList.firstAuthor.lastname     = primaryAuthorLastName;
       authorList.firstAuthor.firstname    = primaryAuthorFirstName;
@@ -55,7 +55,7 @@ export class APABibliographyParser {
       
       // parse second author's last name, if exists, and add to AuthorList
       // -------------------------
-      const secondaryAuthorLastName: string = ParserUtils.firstMatch( secondaryAuthorLastNameRe, nameListString );
+      const secondaryAuthorLastName: string = ParserUtils.firstCapturingGroup( secondaryAuthorLastNameRe, nameListString );
       if ( secondaryAuthorLastName === null ){
         authorList.secondAuthor = null;
       } else {
@@ -109,9 +109,9 @@ export class APABibliographyParser {
     const pubYearRe = /^.*?\. ?.+?\..+?([1][0-9][0-9][0-9]|[2][0][0-2][0-9])/m;
     // ============
 
-    const nameListOrTitle: string | null = ParserUtils.firstMatch( nameListOrTitleRe, unparsedReference );
-    const title: string | null           = ParserUtils.firstMatch( titleRe, unparsedReference );
-    const pubYear: string | null         = ParserUtils.firstMatch( pubYearRe, unparsedReference );
+    const nameListOrTitle: string | null = ParserUtils.firstCapturingGroup( nameListOrTitleRe, unparsedReference );
+    const title: string | null           = ParserUtils.firstCapturingGroup( titleRe, unparsedReference );
+    const pubYear: string | null         = ParserUtils.firstCapturingGroup( pubYearRe, unparsedReference );
    
 
     // figure out if nameListOrTitle matched the name list or the title.
@@ -137,7 +137,7 @@ export class APABibliographyParser {
       // (That way, we don't pick up years that are inside titles.)
       const indexOfTitle = unparsedReference.indexOf( reference.title );
       const referenceWithoutTitle: string = unparsedReference.slice( indexOfTitle );
-      reference.pubYear = ParserUtils.firstMatch( pubYearRe, referenceWithoutTitle );
+      reference.pubYear = ParserUtils.firstCapturingGroup( pubYearRe, referenceWithoutTitle );
     } else {
       // if we don't have a title, we're already in a bad way, so give up and
       // let the human parse this one.
