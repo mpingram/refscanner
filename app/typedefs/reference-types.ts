@@ -11,15 +11,10 @@ export interface Author {
   firstInitial?: string;
 }
 
-export interface AuthorList {
-  firstAuthor: Author;
-  secondAuthor?: Author;
-  threeOrMoreAuthors?: boolean;// "et al." | "and colleagues"
-}
 
 export interface Reference {
   unparsedNameList?: string|null;
-  parsedNameList?: AuthorList|null;
+  parsedNameList?: Author[];
   title?: string|null;
   pubYear?: string;
   original: string;

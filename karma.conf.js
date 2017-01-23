@@ -2,7 +2,7 @@
 module.exports = function(config) {
 
   config.set({
-    basePath: 'compiled/spec',
+    basePath: 'dist',
     frameworks: ['jasmine'],
     plugins: [
       //require('jasmine-node'),

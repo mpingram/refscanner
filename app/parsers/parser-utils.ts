@@ -80,6 +80,10 @@ export class ParserUtils {
     return name.slice(0,1);   
   }
 
+  static getFootnotes( mainText: string ): string {
+    return "Implement Me";
+  }
+  
   static fixMissingQuotationMark( title: string ): string {
     // if title begins with a quotation mark but doesn't end with a quotation mark... 
     // FIXME: account for inner quotations (“ ”). Wow, not sure how to deal with that inconsistency
@@ -98,7 +102,13 @@ export class ParserUtils {
   }
 
   private static standardizeQuotationMarks( text: string ): string {
-    return text.replace( /“|”/g, "\"");
+    return text.replace( /“|”|‘|’/g, function( match: string, doubleQuotes: string, singleQuotes: string ){
+      if ( match === "“" || match === "”" ){
+        return "\"";
+      } else if ( match === "‘" || match === "’" ){
+        return "\'";
+      }
+    });
   }
 
 
