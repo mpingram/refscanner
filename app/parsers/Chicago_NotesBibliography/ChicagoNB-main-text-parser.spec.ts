@@ -2,34 +2,85 @@
 import { ChicagoNBMainTextParser } from "./ChicagoNB-main-text-parser";
 
 // typedefs
-import { Reference } from "../../typedefs/reference-types";
+import { ParserReport, Reference, FormattingProblem } from "../../typedefs/reference-types";
 
 // mocks
-import { singleMainText, parsedSingleMainText } from "../../spec/test_papers/Chicago-NotesBibliography/ChicagoNB-single-reference-pair";
+import * as SingleMainText from "../../spec/test_papers/Chicago-NotesBibliography/ChicagoNB-single-main-text";
 
-describe( "Chicago Notes/Bibliography parser", () => {
+describe( "Chicago Notes/Bibliography Main Text parser", () => {
 
-  it( "should accurately parse a single bilbiography reference", () => {
+  let output: ParserReport;
+  let expected_output: ParserReport;
+  let expected_formattingProblems: FormattingProblem[];
+  let input: string;
 
-    const output: Reference[] = ChicagoNBMainTextParser.parse( singleMainText );
-    const expected_output: Reference[] = parsedSingleMainText;
+  function runParser( input: string ): ParserReport {
+    return ChicagoNBMainTextParser.parse( input );
+  }
 
-    expect( output ).toEqual( expected_output );
+  function buildParserReport( references: Reference[], formattingProblems: FormattingProblem[] = null): ParserReport {
+     return {
+       references: references,
+       formattingProblems: formattingProblems
+     }
+  }
+
+  describe( "single reference tests", () => {
+
+
+    it( "should accurately parse a single main text reference", () => {
+
+      input = SingleMainText.mainText;
+      expected_output = SingleMainText.parserReport;
+      output = runParser( input );
+
+      expect( output ).toEqual( expected_output );
+
+    });
+
+    it( "should reduce valid ibid and short form references.", () => {
+      input = SingleMainText.mainTextWithDuplicates;
+      expected_output = SingleMainText.parserReport;
+      output = runParser( input );
+
+      expect( output ).toEqual( expected_output );
+    });
+
+    it( "should report invalid ibid references.", () => {
+      input = SingleMainText.mainTextwithInvalidIbid;
+      expected_output = SingleMainText.parserReportInvalidIbid;
+      output = runParser( input );
+
+      expect( output ).toEqual( expected_output );
+    });
+
+    it( "should report invalid numbering order.", () => {
+      input = SingleMainText.mainTextwithInvalidOrder;
+      expected_output = SingleMainText.parserReportInvalidIbid;
+    });
 
   });
 
+  describe( "multiple reference tests", () => {
+    it( "should accurately parse a large set of valid main text references", () => {
 
+    });
 
-  it( "should accurately parse a large set of valid bibliography references", () => {
+    it( "should accurately parse a large set of mixed valid and invalid references", () => {
 
-  });
+    });
 
-  it( "should accurately parse a large set of mixed valid and invalid references", () => {
+    it( "should report incorrect alphabetical order when parsing.", () => {
 
-  });
+    });
 
-  it( "should check for incorrect alphabetical order.", () => {
+    it( "should report duplicate references when parsing.", () => {
+
+    });
 
   });
   
+
+
+
 });

@@ -11,17 +11,34 @@ export interface Author {
   firstInitial?: string;
 }
 
-
 export interface Reference {
-  unparsedNameList?: string|null;
-  parsedNameList?: Author[];
-  title?: string|null;
-  pubYear?: string;
+  unparsedNameList: string | null;
+  parsedNameList: Author[] | null
+  title: string | null;
+  pubYear: string | null;
+
   original: string;
   index: number;
 }
 
-export type UnparsedReference = string;
+
+export interface ParserReport {
+  references: Reference[],
+  formattingProblems: FormattingProblem[] | null,
+}
+
+export interface FormattingProblem {
+  type: FormattingProblemType,
+  original: string,
+  index: number,
+}
+
+export enum FormattingProblemType {
+  "alphabeticalOrder",
+  "numericalOrder",
+  "duplicate",
+}
+
 export type ParsedReferenceSet = Reference[];
 
 export type PossibleBiblioReferenceSet = Array<Array<string>>;
