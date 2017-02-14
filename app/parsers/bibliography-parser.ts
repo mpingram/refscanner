@@ -49,7 +49,7 @@ export class BibliographyParser {
       // if so, look for Jr. or Sr. immediately to left.
       // if not, look for single initial immediately to left.
       // the result of this is important -- it'll determine where we look for the title. (!!)
-      const nameListEndCheck = /
+      const nameListEndCheck = / /g;
       // match block of text between first and second period,
       //   after which should occur a date.
       const titleRe = /^.*?\. ?(.+?)\..+?([1][0-9][0-9][0-9]|[2][0][0-2][0-9])/m;

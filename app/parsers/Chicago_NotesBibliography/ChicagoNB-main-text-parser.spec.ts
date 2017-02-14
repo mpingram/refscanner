@@ -18,12 +18,6 @@ describe( "Chicago Notes/Bibliography Main Text parser", () => {
     return ChicagoNBMainTextParser.parse( input );
   }
 
-  function buildParserReport( references: Reference[], formattingProblems: FormattingProblem[] = null): ParserReport {
-     return {
-       references: references,
-       formattingProblems: formattingProblems
-     }
-  }
 
   describe( "single reference tests", () => {
 

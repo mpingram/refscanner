@@ -1,11 +1,10 @@
-import { ParserUtils } from "../parser-utils";
+import * as ParserUtils from "../parser-utils";
 import { Reference,
   Author,
-  AuthorList,
 } from "../../typedefs/reference-types";
 
 
-export class APABibliographyParser {
+export class MLABibliographyParser {
 
   public static parse( bibliography: string ): Reference[] {
 
@@ -22,6 +21,7 @@ export class APABibliographyParser {
 
   private static parseNameList( nameListString: string, previouslyParsedReferences: Reference[] ): AuthorList {
 
+      // TODO: convert to Author[]
       let authorList: AuthorList = {} as AuthorList;
       authorList.firstAuthor = {} as Author;
       authorList.secondAuthor = {} as Author;

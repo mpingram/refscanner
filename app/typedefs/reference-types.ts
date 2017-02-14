@@ -11,9 +11,14 @@ export interface Author {
   firstInitial?: string;
 }
 
+export interface AuthorList {
+  [index: number]: Author;
+  etAl?: boolean;
+}
+
 export interface Reference {
   unparsedNameList: string | null;
-  parsedNameList: Author[] | null
+  parsedNameList: Author[] | null;
   title: string | null;
   pubYear: string | null;
 
@@ -23,14 +28,14 @@ export interface Reference {
 
 
 export interface ParserReport {
-  references: Reference[],
-  formattingProblems: FormattingProblem[] | null,
+  references: Reference[];
+  formattingProblems: FormattingProblem[] | null;
 }
 
 export interface FormattingProblem {
-  type: FormattingProblemType,
-  original: string,
-  index: number,
+  type: FormattingProblemType;
+  original: string;
+  index: number;
 }
 
 export enum FormattingProblemType {
