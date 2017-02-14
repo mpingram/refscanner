@@ -54,6 +54,7 @@ export function allMatches( regex: RegExp, text: string ): Match[] | null {
   let noMatches: boolean = true;
 
   let execArr: RegExpExecArray;
+  // exec regex over text in a while loop
   while ( ( execArr = regex.exec( text ) ) !== null ){
     if ( noMatches !== false ){
       noMatches = false;
@@ -74,7 +75,7 @@ export function firstMatch( regex: RegExp, text: string ): Match | null {
   return this.execArrayToMatch( execArr );
 }
 
-export function getInitialChar( name: string | null ): string | null {
+export function initialChar( name: string | null ): string | null {
   if ( name === null ) return null;
   return name.slice(0,1);   
 }

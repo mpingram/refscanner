@@ -18,7 +18,7 @@ export interface AuthorList {
 
 export interface Reference {
   unparsedNameList: string | null;
-  parsedNameList: Author[] | null;
+  parsedNameList: AuthorList | null;
   title: string | null;
   pubYear: string | null;
 
@@ -26,6 +26,10 @@ export interface Reference {
   index: number;
 }
 
+export interface UnparsedReference {
+  original: string;
+  index: number;
+}
 
 export interface ParserReport {
   references: Reference[];
@@ -40,8 +44,6 @@ export interface FormattingProblem {
 
 export enum FormattingProblemType {
   "alphabeticalOrder",
-  "numericalOrder",
-  "duplicate",
 }
 
 export type ParsedReferenceSet = Reference[];

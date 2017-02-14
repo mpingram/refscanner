@@ -4,5 +4,4 @@ export interface Match {
   captures?: string[];
   index: number;
 
-
 }
